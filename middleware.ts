@@ -6,17 +6,19 @@ export default withAuth(
     const token = req.nextauth.token;
     const { pathname } = req.nextUrl;
     
-    // Role-based access control
+    // Strict role-based access control
+    // Each role can ONLY access their own portal
+    
     if (pathname.startsWith("/teacher")) {
-      // Only teachers, admins, and super_admins can access teacher routes
-      if (token?.role !== "teacher" && token?.role !== "admin" && token?.role !== "super_admin") {
+      // Only teachers can access teacher routes
+      if (token?.role !== "teacher") {
         return NextResponse.redirect(new URL("/unauthorized", req.url));
       }
     }
     
     if (pathname.startsWith("/admin")) {
-      // Only admins and super_admins can access admin routes
-      if (token?.role !== "admin" && token?.role !== "super_admin") {
+      // Only admins can access admin routes
+      if (token?.role !== "admin") {
         return NextResponse.redirect(new URL("/unauthorized", req.url));
       }
     }

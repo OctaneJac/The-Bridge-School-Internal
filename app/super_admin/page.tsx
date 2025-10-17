@@ -49,11 +49,10 @@ export default async function SuperAdminPage() {
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                   <ul className="list-disc list-inside space-y-1">
                     <li>✅ Super Admin Dashboard</li>
-                    <li>✅ Admin Dashboard</li>
-                    <li>✅ Teacher Dashboard</li>
                     <li>✅ Full System Access</li>
-                    <li>✅ Manage All Users</li>
+                    <li>✅ Manage All Users & Roles</li>
                     <li>✅ System Configuration</li>
+                    <li>✅ Database Management</li>
                     <li>✅ All Reports & Analytics</li>
                   </ul>
                 </dd>

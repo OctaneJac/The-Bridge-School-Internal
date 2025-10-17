@@ -15,9 +15,9 @@ export default async function AdminLayout({
     redirect("/login");
   }
 
-  // Check if user has admin or super_admin role
+  // Check if user has admin role only
   const userRole = (session.user as any)?.role;
-  if (userRole !== "admin" && userRole !== "super_admin") {
+  if (userRole !== "admin") {
     redirect("/unauthorized");
   }
 

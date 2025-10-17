@@ -1,100 +1,125 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { ShieldX, Home, User, UserCog, Crown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 export default async function UnauthorizedPage() {
   const session = await getServerSession(authOptions);
   const userRole = (session?.user as any)?.role;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full space-y-8">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Access Denied
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="max-w-2xl w-full space-y-6">
+        {/* Header Section */}
+        <div className="text-center space-y-3">
+          <div className="flex justify-center">
+            <div className="rounded-full bg-destructive/10 p-3">
+              <ShieldX className="h-12 w-12 text-destructive" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight">Access Denied</h1>
+          <p className="text-muted-foreground">
             You don't have permission to access this page.
           </p>
           {userRole && (
-            <p className="mt-2 text-sm text-gray-600">
-              Your current role: <span className="font-semibold">{userRole}</span>
-            </p>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-sm text-muted-foreground">Your current role:</span>
+              <Badge variant="secondary" className="capitalize">
+                {userRole.replace("_", " ")}
+              </Badge>
+            </div>
           )}
         </div>
 
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-          <div className="px-4 py-5 sm:px-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
-              Access Levels
-            </h3>
-            <p className="mt-1 max-w-2xl text-sm text-gray-500">
-              Different roles have different access permissions
-            </p>
-          </div>
-          <div className="border-t border-gray-200">
-            <dl>
-              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Teacher</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  <ul className="list-disc list-inside">
-                    <li>Teacher Dashboard</li>
-                  </ul>
-                </dd>
+        {/* Access Levels Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Access Levels</CardTitle>
+            <CardDescription>
+              Each role has access to their own portal only
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+              <User className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <div className="flex-1">
+                <p className="font-medium text-sm">Teacher</p>
+                <p className="text-sm text-muted-foreground">
+                  Teacher Dashboard Only
+                </p>
               </div>
-              <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Admin</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  <ul className="list-disc list-inside">
-                    <li>Admin Dashboard</li>
-                    <li>Teacher Dashboard</li>
-                  </ul>
-                </dd>
-              </div>
-              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Super Admin</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  <ul className="list-disc list-inside">
-                    <li>Super Admin Dashboard</li>
-                    <li>Admin Dashboard</li>
-                    <li>Teacher Dashboard</li>
-                  </ul>
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </div>
+            </div>
 
-        <div className="flex justify-center space-x-4">
-          <Link
-            href="/"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Go back home
-          </Link>
+            <Separator />
+
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+              <UserCog className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <div className="flex-1">
+                <p className="font-medium text-sm">Admin</p>
+                <p className="text-sm text-muted-foreground">
+                  Admin Dashboard Only
+                </p>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+              <Crown className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <div className="flex-1">
+                <p className="font-medium text-sm">Super Admin</p>
+                <p className="text-sm text-muted-foreground">
+                  Super Admin Dashboard Only
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row justify-center gap-3">
+          <Button asChild variant="default">
+            <Link href="/">
+              <Home className="mr-2 h-4 w-4" />
+              Go back home
+            </Link>
+          </Button>
+
           {userRole === "teacher" && (
-            <Link
-              href="/teacher"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Go to Teacher Dashboard
-            </Link>
+            <Button asChild variant="outline">
+              <Link href="/teacher">
+                <User className="mr-2 h-4 w-4" />
+                Go to Teacher Dashboard
+              </Link>
+            </Button>
           )}
+
           {userRole === "admin" && (
-            <Link
-              href="/admin"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Go to Admin Dashboard
-            </Link>
+            <Button asChild variant="outline">
+              <Link href="/admin">
+                <UserCog className="mr-2 h-4 w-4" />
+                Go to Admin Dashboard
+              </Link>
+            </Button>
           )}
+
           {userRole === "super_admin" && (
-            <Link
-              href="/super_admin"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Go to Super Admin Dashboard
-            </Link>
+            <Button asChild variant="outline">
+              <Link href="/super_admin">
+                <Crown className="mr-2 h-4 w-4" />
+                Go to Super Admin Dashboard
+              </Link>
+            </Button>
           )}
         </div>
       </div>

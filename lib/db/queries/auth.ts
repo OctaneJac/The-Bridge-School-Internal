@@ -32,6 +32,8 @@ export async function getUserById(id: string) {
       id: users.id,
       email: users.email,
       role: users.role,
+      first_name: users.first_name,
+      last_name: users.last_name,
       createdAt: users.createdAt,
     })
     .from(users)

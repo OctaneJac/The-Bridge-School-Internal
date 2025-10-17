@@ -49,9 +49,9 @@ export default async function AdminPage() {
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                   <ul className="list-disc list-inside space-y-1">
                     <li>✅ Admin Dashboard</li>
-                    <li>✅ Teacher Dashboard</li>
                     <li>✅ Manage Users</li>
                     <li>✅ View Reports</li>
+                    <li>✅ System Settings</li>
                   </ul>
                 </dd>
               </div>
