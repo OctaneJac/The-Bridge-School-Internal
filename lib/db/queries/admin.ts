@@ -1,8 +1,3 @@
-/**
- * Admin-specific database queries
- * Add your admin-related database operations here
- */
-
 import { db } from "../index";
 import { users } from "../schema";
 import { eq, or } from "drizzle-orm";

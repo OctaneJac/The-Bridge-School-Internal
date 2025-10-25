@@ -1,8 +1,3 @@
-/**
- * Authentication-related database queries
- * Handles user authentication, session management, and user lookups
- */
-
 import { db } from "../index";
 import { users } from "../schema";
 import { eq } from "drizzle-orm";
@@ -95,44 +90,4 @@ export async function createUser(
     });
   
   return newUser[0];
-}
-
-/**
- * Update user password
- * New password will be automatically hashed
- */
-export async function updateUserPassword(userId: string, newPassword: string) {
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-  
-  const updated = await db
-    .update(users)
-    .set({ password: hashedPassword })
-    .where(eq(users.id, userId))
-    .returning({
-      id: users.id,
-      email: users.email,
-    });
-  
-  return updated[0];
-}
-
-/**
- * Update user role
- * Only admins and super_admins should call this
- */
-export async function updateUserRole(
-  userId: string,
-  newRole: "teacher" | "admin" | "super_admin"
-) {
-  const updated = await db
-    .update(users)
-    .set({ role: newRole })
-    .where(eq(users.id, userId))
-    .returning({
-      id: users.id,
-      email: users.email,
-      role: users.role,
-    });
-  
-  return updated[0];
 }

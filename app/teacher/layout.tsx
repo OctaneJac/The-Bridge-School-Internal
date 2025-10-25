@@ -43,7 +43,7 @@ export default async function TeacherLayout({
         }}
       />
       <SidebarInset>
-        <div className="fixed top-4 right-4 z-50">
+        <div className="absolute top-4 right-4 z-50">
           <AnimatedThemeToggler />
         </div>
         {children}

@@ -14,7 +14,7 @@ import {
 // ENUMS
 // =========================
 export const studentStatusEnum = pgEnum('student_status', ['active', 'inactive', 'graduated', 'transferred']);
-export const attendanceStatusEnum = pgEnum('attendance_status', ['present', 'absent', 'late', 'excused']);
+export const attendanceStatusEnum = pgEnum('attendance_status', ['present', 'absent']);
 
 // =========================
 // USERS
