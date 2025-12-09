@@ -12,7 +12,6 @@ export * from "./auth";
 // Role-specific queries
 export * from "./teacher";
 export * from "./admin";
-export * from "./super-admin";
 
 // Re-export db instance for direct access if needed
 export { db } from "../index";

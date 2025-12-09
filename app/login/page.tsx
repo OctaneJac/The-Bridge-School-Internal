@@ -21,6 +21,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,10 +41,8 @@ export default function LoginPage() {
       
       if (userRole === "teacher") {
         router.push("/teacher");
-      } else if (userRole === "admin") {
+      } else if (userRole === "admin" || "super_admin") {
         router.push("/admin");
-      } else if (userRole === "super_admin") {
-        router.push("/super_admin");
       } else {
         router.push("/");
       }
@@ -73,14 +72,9 @@ export default function LoginPage() {
 
         if (session?.user?.role === "teacher") {
           router.push("/teacher");
-        } else if (session?.user?.role === "admin") {
+        } else if (session?.user?.role === "admin" || "super_admin") {
           router.push("/admin");
-        } else if (session?.user?.role === "super_admin") {
-          router.push("/super_admin");
-        } else {
-          router.push(callbackUrl);
         }
-        router.refresh();
       }
     } catch (err) {
       setError("An unexpected error occurred");
@@ -88,16 +82,12 @@ export default function LoginPage() {
     }
   };
 
-  const handleSocialSignIn = (provider: string) => {
-    // for social providers we typically allow default redirect behavior
-    signIn(provider);
-  };
-
   return (
     <div className={cn("min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8")}>
       <div className="max-w-md w-full">
         <Card>
           <CardHeader className="text-center">
+            <Image src="/logo.jpg" alt="The Bridge School Logo" width={100} height={100} className="mx-auto mb-2" />
             <CardTitle className="text-xl">Welcome to The Bridge School Portal</CardTitle>
             <CardDescription>Login with your credentials</CardDescription>
           </CardHeader>

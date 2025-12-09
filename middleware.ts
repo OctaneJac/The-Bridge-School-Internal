@@ -18,14 +18,7 @@ export default withAuth(
     
     if (pathname.startsWith("/admin")) {
       // Only admins can access admin routes
-      if (token?.role !== "admin") {
-        return NextResponse.redirect(new URL("/unauthorized", req.url));
-      }
-    }
-    
-    if (pathname.startsWith("/super_admin")) {
-      // Only super_admins can access super_admin routes
-      if (token?.role !== "super_admin") {
+      if (token?.role !== "admin" || "super_admin") {
         return NextResponse.redirect(new URL("/unauthorized", req.url));
       }
     }
@@ -44,5 +37,5 @@ export default withAuth(
 
 // Protect all role-based routes
 export const config = {
-  matcher: ["/teacher/:path*", "/admin/:path*", "/super_admin/:path*"],
+  matcher: ["/teacher/:path*", "/admin/:path*"],
 };
