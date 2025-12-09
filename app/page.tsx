@@ -13,10 +13,8 @@ export default async function Home() {
     
     if (userRole === "teacher") {
       redirect("/teacher");
-    } else if (userRole === "admin") {
+    } else if (userRole === "admin" || userRole === "super_admin") {
       redirect("/admin");
-    } else if (userRole === "super_admin") {
-      redirect("/super_admin");
     }
   }
   

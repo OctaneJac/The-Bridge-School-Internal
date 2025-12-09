@@ -27,6 +27,7 @@ export const users = pgTable("User", {
   last_name: varchar("last_name", { length: 255 }),
   role: varchar("role", { length: 50 }).notNull().$type<"teacher" | "admin" | "super_admin">(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  branch_id: integer("branch_id").references(() => branches.id),
 });
 
 export type User = typeof users.$inferSelect;

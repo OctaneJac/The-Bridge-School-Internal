@@ -17,8 +17,14 @@ export default withAuth(
     }
     
     if (pathname.startsWith("/admin")) {
-      // Only admins can access admin routes
-      if (token?.role !== "admin" || "super_admin") {
+      // Only admins and super_admins can access admin routes
+      if (token?.role !== "admin" && token?.role !== "super_admin") {
+        return NextResponse.redirect(new URL("/unauthorized", req.url));
+      }
+    }
+
+    if (pathname.startsWith("/admin-portal")){
+      if (token?.role !== "super_admin"){
         return NextResponse.redirect(new URL("/unauthorized", req.url));
       }
     }

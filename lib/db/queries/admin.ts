@@ -1,5 +1,5 @@
 import { db } from "../index";
-import { users } from "../schema";
+import { users, branches } from "../schema";
 import { eq, or } from "drizzle-orm";
 
 /**
@@ -107,6 +107,58 @@ export async function deleteUser(userId: string) {
     });
   
   return deleted[0];
+}
+
+/**
+ * Get all branches
+ * Returns list of all branches in the system
+ */
+export async function getAllBranches() {
+  const allBranches = await db
+    .select({
+      id: branches.id,
+      name: branches.name,
+      address: branches.address,
+      created_at: branches.created_at,
+      updated_at: branches.updated_at,
+    })
+    .from(branches);
+  
+  // Sort by name alphabetically
+  return allBranches.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Get user's branch
+ * Returns the branch associated with a user
+ */
+export async function getUserBranch(userId: string) {
+  const user = await db
+    .select({
+      branch_id: users.branch_id,
+    })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  
+    
+  if (!user[0]?.branch_id) {
+    return null;
+  }
+  
+  const branch = await db
+    .select({
+      id: branches.id,
+      name: branches.name,
+      address: branches.address,
+      created_at: branches.created_at,
+      updated_at: branches.updated_at,
+    })
+    .from(branches)
+    .where(eq(branches.id, user[0].branch_id))
+    .limit(1);
+  
+  return branch[0] || null;
 }
 
 // TODO: Add more admin-specific queries

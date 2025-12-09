@@ -72,7 +72,6 @@
   --sidebar-ring: oklch(0.41 0.159 10.272);
 }
 
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

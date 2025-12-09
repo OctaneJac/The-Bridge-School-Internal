@@ -41,10 +41,10 @@ export default function LoginPage() {
       
       if (userRole === "teacher") {
         router.push("/teacher");
-      } else if (userRole === "admin" || "super_admin") {
+      } else if (userRole === "admin" || userRole === "super_admin") {
         router.push("/admin");
-      } else {
-        router.push("/");
+      // } else {
+      //   router.push("/");
       }
     }
   }, [status, session, router]);
@@ -69,11 +69,14 @@ export default function LoginPage() {
         // Get the session to check user role and redirect accordingly
         const response = await fetch("/api/auth/session");
         const session = await response.json();
+        const userRole = session?.user?.role;
 
-        if (session?.user?.role === "teacher") {
+        if (userRole === "teacher") {
           router.push("/teacher");
-        } else if (session?.user?.role === "admin" || "super_admin") {
+        } else if (userRole === "admin" || userRole === "super_admin") {
           router.push("/admin");
+        } else {
+          router.push("/");
         }
       }
     } catch (err) {
