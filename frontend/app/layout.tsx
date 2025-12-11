@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Bridge School | Internal",
+  title: "The Bridge School",
   description: "Internal portal for The Bridge School staff and administrators.",
 };
 

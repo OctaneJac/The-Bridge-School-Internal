@@ -4,26 +4,23 @@ import {
     SidebarProvider,
     SidebarTrigger,
   } from "@/components/ui/sidebar"
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { getUserBranch } from "@/lib/db/queries/admin";
+import { getAuthSession, getBranchId } from "@/lib/auth";
 import { BranchProvider } from "@/contexts/branch-context";
+import { getBranchById } from "@/lib/db/admin";
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions);
-  const userId = (session?.user as any)?.id;
-  
-  // Get teacher's branch
-  const userBranch = userId ? await getUserBranch(userId) : null;
+  const session = await getAuthSession();
+  const branchId = getBranchId(session);
+  const branch = branchId ? await getBranchById(branchId) : null;
 
   return (
-    <BranchProvider initialBranch={userBranch || null} initialBranchId={userBranch?.id || null}>
+    <BranchProvider initialBranch={branch} initialBranchId={branch?.id || null}>
       <SidebarProvider>
-        <TeacherSidebar branch={userBranch} />
+        <TeacherSidebar branch={branch} />
         <SidebarInset>
           <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4">

@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     
     # API settings
-    API_V1_PREFIX: str = "/api/v1"
+    API_V1_PREFIX: str = ""
     PROJECT_NAME: str = "The Bridge School API"
     
     # Security settings
@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # CORS settings
-    CORS_ORIGINS: List[str] = ["https://localhost:3000", "http://localhost:3001"]
+    CORS_ORIGINS: List[str] = ["https://localhost:3000", "http://localhost:3000"]
     
     class Config:
         env_file = ".env"

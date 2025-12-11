@@ -66,18 +66,9 @@ export default function LoginPage() {
         setError(result.error);
         setIsLoading(false);
       } else if (result?.ok) {
-        // Get the session to check user role and redirect accordingly
-        const response = await fetch("/api/auth/session");
-        const session = await response.json();
-        const userRole = session?.user?.role;
-
-        if (userRole === "teacher") {
-          router.push("/teacher");
-        } else if (userRole === "admin" || userRole === "super_admin") {
-          router.push("/admin");
-        } else {
-          router.push("/");
-        }
+        // Session will be updated automatically via useSession hook
+        // The useEffect above will handle the redirect
+        setIsLoading(false);
       }
     } catch (err) {
       setError("An unexpected error occurred");

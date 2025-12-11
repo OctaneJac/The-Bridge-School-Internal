@@ -4,40 +4,33 @@ import {
     SidebarProvider,
     SidebarTrigger,
   } from "@/components/ui/sidebar"
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { getUserBranch, getAllBranches } from "@/lib/db/queries/admin";
+import { getAuthSession, getUserRole, getBranchId } from "@/lib/auth";
 import { BranchProvider } from "@/contexts/branch-context";
+import { getBranchById, getAllBranches } from "@/lib/db/admin";
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions);
-  const userId = (session?.user as any)?.id;
-  const userRole = (session?.user as any)?.role;
+  const session = await getAuthSession();
+  const userRole = getUserRole(session);
+  const sessionBranchId = getBranchId(session);
   
-  // Get user's branch
-  const userBranch = userId ? await getUserBranch(userId) : null;
-  
-  // For super_admin: fetch all branches and initialize with first branch if userBranch is null
-  // For admin/teacher: use their assigned branch
-  let initialBranch = userBranch;
+  let initialBranch = null;
   let allBranches: any[] = [];
   
   if (userRole === "super_admin") {
     allBranches = await getAllBranches();
-    // If super_admin has no branch assigned, initialize with first branch from list
-    if (!initialBranch && allBranches.length > 0) {
-      initialBranch = allBranches[0];
-    }
+    initialBranch = await getBranchById(sessionBranchId || 1);
+  } else if (sessionBranchId) {
+    initialBranch = await getBranchById(sessionBranchId);
   }
 
   return (
     <BranchProvider initialBranch={initialBranch || null} initialBranchId={initialBranch?.id || null}>
       <SidebarProvider>
-        <AdminSidebar branch={initialBranch} allBranches={allBranches} userRole={userRole} />
+        <AdminSidebar branch={initialBranch} allBranches={allBranches} userRole={userRole || undefined} />
         <SidebarInset>
           <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4">

@@ -2,6 +2,8 @@
 
 import * as React from "react"
 import { ChevronsUpDown, Plus, Building2 } from "lucide-react"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 import {
   DropdownMenu,
@@ -34,6 +36,9 @@ export function TeamSwitcher({
 }) {
   const { isMobile } = useSidebar()
   const { currentBranch, setCurrentBranch, setCurrentBranchId } = useBranch()
+  const { data: session, update } = useSession()
+  const router = useRouter()
+  const [isUpdating, setIsUpdating] = React.useState(false)
   
   // Find active team based on current branch
   const activeTeam = React.useMemo(() => {
@@ -43,19 +48,52 @@ export function TeamSwitcher({
     return teams[0]
   }, [currentBranch, teams])
 
-  const handleTeamChange = (team: typeof teams[0]) => {
+  const handleTeamChange = async (team: typeof teams[0]) => {
     if (team.id && currentBranch && team.id === currentBranch.id) {
       // Branch already selected
       return
     }
-    // Update branch context when switching
-    if (team.id) {
+    
+    if (!team.id) return
+    
+    setIsUpdating(true)
+    
+    try {
+      // Validate branch exists (API only validates, doesn't update database)
+      const response = await fetch("/api/auth/update-branch", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ branch_id: team.id }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: "Failed to update branch" }))
+        console.error("Failed to update branch:", error)
+        setIsUpdating(false)
+        return
+      }
+
       // Use the branch data from the team object or find it in branches array
       const fullBranch = team.branch || branches?.find(b => b.id === team.id)
       if (fullBranch) {
+        // Update local context
         setCurrentBranch(fullBranch)
         setCurrentBranchId(fullBranch.id)
+        
+        // Update session token with new branch_id (no database change)
+        await update({
+          branch_id: fullBranch.id,
+        })
+        
+        // Refresh server components to use new branch_id from session
+        router.refresh()
       }
+    } catch (error) {
+      console.error("Error updating branch:", error)
+    } finally {
+      setIsUpdating(false)
     }
   }
 

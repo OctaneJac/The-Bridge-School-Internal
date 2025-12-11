@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 from core.db import Base
 
-
 class Grade(Base):
     __tablename__ = "grades"
     
