@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { DataTableColumnHeader } from "@/components/tables/data-table-column-header"
 
 export type StudentData = {
-  student_id: string
+  id: number
   student_name: string
   attendance_rate: number
 }

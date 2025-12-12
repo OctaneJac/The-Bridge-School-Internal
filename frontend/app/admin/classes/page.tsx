@@ -202,7 +202,7 @@ export default function ClassesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Classes</h1>
@@ -285,128 +285,152 @@ export default function ClassesPage() {
               : null)
 
             return (
-              <Link key={classItem.id} href={`/admin/classes/${classItem.id}`}>
-                <Card className="relative cursor-pointer hover:shadow-md transition-shadow">
+              <Card key={classItem.id} className="relative cursor-pointer hover:shadow-md transition-shadow">
+                <Link href={`/admin/classes/${classItem.id}`} className="block">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <CardTitle className="pr-2">{classItem.name}</CardTitle>
-                      <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-10 w-10 rounded-full"
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {assignedTeacher ? (
+                        <div className="flex items-center gap-2 text-sm">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-muted-foreground">
+                            {getTeacherName(assignedTeacher)}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <User className="h-4 w-4" />
+                          <span>No teacher assigned</span>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Link>
+                <div 
+                  className="absolute top-4 right-4 z-10"
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                  }}
+                >
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-10 w-10 rounded-full"
+                        disabled={assigning === classItem.id}
+                        onMouseDown={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                        }}
+                      >
+                        {assigning === classItem.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage
+                              src={`https://api.dicebear.com/7.x/initials/svg?seed=${getTeacherName(assignedTeacher)}`}
+                              alt={getTeacherName(assignedTeacher)}
+                            />
+                            <AvatarFallback>
+                              {getTeacherInitials(assignedTeacher)}
+                            </AvatarFallback>
+                          </Avatar>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent 
+                      className="w-80" 
+                      align="end"
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-medium text-sm mb-2">
+                            Assign Teacher
+                          </h4>
+                          <p className="text-xs text-muted-foreground mb-3">
+                            Select a teacher to assign to this class
+                          </p>
+                        </div>
+                        <Select
+                          value={classItem.class_teacher_id || ""}
+                          onValueChange={(value) =>
+                            handleAssignTeacher(
+                              classItem.id,
+                              value === "none" ? null : value
+                            )
+                          }
                           disabled={assigning === classItem.id}
-                          onClick={(e) => e.stopPropagation()}
                         >
-                          {assigning === classItem.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Avatar className="h-10 w-10">
-                              <AvatarImage
-                                src={`https://api.dicebear.com/7.x/initials/svg?seed=${getTeacherName(assignedTeacher)}`}
-                                alt={getTeacherName(assignedTeacher)}
-                              />
-                              <AvatarFallback>
-                                {getTeacherInitials(assignedTeacher)}
-                              </AvatarFallback>
-                            </Avatar>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-80" align="end">
-                        <div className="space-y-4">
-                          <div>
-                            <h4 className="font-medium text-sm mb-2">
-                              Assign Teacher
-                            </h4>
-                            <p className="text-xs text-muted-foreground mb-3">
-                              Select a teacher to assign to this class
-                            </p>
-                          </div>
-                          <Select
-                            value={classItem.class_teacher_id || ""}
-                            onValueChange={(value) =>
-                              handleAssignTeacher(
-                                classItem.id,
-                                value === "none" ? null : value
-                              )
-                            }
-                            disabled={assigning === classItem.id}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a teacher" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a teacher" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">
+                              <div className="flex items-center gap-2">
+                                <User className="h-4 w-4" />
+                                <span>No teacher</span>
+                              </div>
+                            </SelectItem>
+                            {teachers.map((teacher) => (
+                              <SelectItem key={teacher.id} value={teacher.id}>
                                 <div className="flex items-center gap-2">
-                                  <User className="h-4 w-4" />
-                                  <span>No teacher</span>
+                                  <Avatar className="h-6 w-6">
+                                    <AvatarImage
+                                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${getTeacherName(teacher)}`}
+                                      alt={getTeacherName(teacher)}
+                                    />
+                                    <AvatarFallback className="text-xs">
+                                      {getTeacherInitials(teacher)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <span>{getTeacherName(teacher)}</span>
                                 </div>
                               </SelectItem>
-                              {teachers.map((teacher) => (
-                                <SelectItem key={teacher.id} value={teacher.id}>
-                                  <div className="flex items-center gap-2">
-                                    <Avatar className="h-6 w-6">
-                                      <AvatarImage
-                                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${getTeacherName(teacher)}`}
-                                        alt={getTeacherName(teacher)}
-                                      />
-                                      <AvatarFallback className="text-xs">
-                                        {getTeacherInitials(teacher)}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <span>{getTeacherName(teacher)}</span>
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {assignedTeacher && (
-                            <div className="pt-2 border-t">
-                              <p className="text-xs text-muted-foreground mb-1">
-                                Current teacher:
-                              </p>
-                              <div className="flex items-center gap-2">
-                                <Avatar className="h-6 w-6">
-                                  <AvatarImage
-                                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${getTeacherName(assignedTeacher)}`}
-                                    alt={getTeacherName(assignedTeacher)}
-                                  />
-                                  <AvatarFallback className="text-xs">
-                                    {getTeacherInitials(assignedTeacher)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm font-medium">
-                                  {getTeacherName(assignedTeacher)}
-                                </span>
-                              </div>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {assignedTeacher && (
+                          <div className="pt-2 border-t">
+                            <p className="text-xs text-muted-foreground mb-1">
+                              Current teacher:
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage
+                                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${getTeacherName(assignedTeacher)}`}
+                                  alt={getTeacherName(assignedTeacher)}
+                                />
+                                <AvatarFallback className="text-xs">
+                                  {getTeacherInitials(assignedTeacher)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="text-sm font-medium">
+                                {getTeacherName(assignedTeacher)}
+                              </span>
                             </div>
-                          )}
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {assignedTeacher ? (
-                      <div className="flex items-center gap-2 text-sm">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-muted-foreground">
-                          {getTeacherName(assignedTeacher)}
-                        </span>
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <User className="h-4 w-4" />
-                        <span>No teacher assigned</span>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </Card>
-              </Link>
             )
           })}
         </div>

@@ -25,16 +25,29 @@ import {
 } from "@/components/ui/select"
 import { Loader2, Plus } from "lucide-react"
 
+interface Class {
+  id: number
+  name: string
+  branch_id: number
+  session_id: number | null
+  class_teacher_id: string | null
+  created_at: Date
+  updated_at: Date
+}
+
 export default function StudentsPage() {
   const { currentBranchId } = useBranch()
   const [students, setStudents] = useState<AllStudentData[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [classes, setClasses] = useState<Class[]>([])
+  const [loadingClasses, setLoadingClasses] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     dob: "",
     gender: "",
+    class_id: "",
   })
   const backend_url = process.env.NEXT_PUBLIC_BACKEND_URL
 
@@ -49,7 +62,13 @@ export default function StudentsPage() {
       try {
         setLoading(true)
         const response = await fetch(
-          `${backend_url}/students_all?branch_id=${currentBranchId}`
+          `${backend_url}/admin/students_all/${currentBranchId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
         )
 
         if (response.ok) {
@@ -68,15 +87,51 @@ export default function StudentsPage() {
     fetchStudents()
   }, [currentBranchId, backend_url])
 
+  // Fetch classes when dialog opens
+  useEffect(() => {
+    if (dialogOpen && currentBranchId) {
+      const fetchClasses = async () => {
+        try {
+          setLoadingClasses(true)
+          const response = await fetch(
+            `${backend_url}/admin/classes/${currentBranchId}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          )
+
+          if (response.ok) {
+            const classesData = await response.json()
+            setClasses(classesData)
+          } else {
+            console.error("Error fetching classes:", response.statusText)
+          }
+        } catch (error) {
+          console.error("Error fetching classes:", error)
+        } finally {
+          setLoadingClasses(false)
+        }
+      }
+
+      fetchClasses()
+    } else {
+      setClasses([])
+      setFormData({ name: "", dob: "", gender: "", class_id: "" })
+    }
+  }, [dialogOpen, currentBranchId, backend_url])
+
   const handleCreateStudent = async () => {
-    if (!formData.name.trim() || !formData.dob || !formData.gender) {
+    if (!formData.name.trim() || !formData.dob || !formData.class_id) {
       return
     }
 
     try {
       setCreating(true)
       const response = await fetch(
-        `${backend_url}/create-student?branch_id=${currentBranchId}`,
+        `${backend_url}/admin/create_student/${currentBranchId}`,
         {
           method: "POST",
           headers: {
@@ -85,7 +140,7 @@ export default function StudentsPage() {
           body: JSON.stringify({
             name: formData.name.trim(),
             dob: formData.dob,
-            gender: formData.gender,
+            class_id: parseInt(formData.class_id),
           }),
         }
       )
@@ -93,13 +148,19 @@ export default function StudentsPage() {
       if (response.ok) {
         // Refresh students list
         const refreshResponse = await fetch(
-          `${backend_url}/students_all?branch_id=${currentBranchId}`
+          `${backend_url}/admin/students_all/${currentBranchId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
         )
         if (refreshResponse.ok) {
           const studentsData = await refreshResponse.json()
           setStudents(studentsData)
         }
-        setFormData({ name: "", dob: "", gender: "" })
+        setFormData({ name: "", dob: "", gender: "", class_id: "" })
         setDialogOpen(false)
       } else {
         const error = await response.json()
@@ -132,7 +193,7 @@ export default function StudentsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Students</h1>
@@ -189,6 +250,25 @@ export default function StudentsPage() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="class">Class</Label>
+                <Select
+                  value={formData.class_id}
+                  onValueChange={(value) => setFormData({ ...formData, class_id: value })}
+                  disabled={loadingClasses}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={loadingClasses ? "Loading classes..." : "Select class"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {classes.map((classItem) => (
+                      <SelectItem key={classItem.id} value={classItem.id.toString()}>
+                        {classItem.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <DialogFooter>
               <Button
@@ -200,7 +280,7 @@ export default function StudentsPage() {
               </Button>
               <Button
                 onClick={handleCreateStudent}
-                disabled={creating || !formData.name.trim() || !formData.dob || !formData.gender}
+                disabled={creating || !formData.name.trim() || !formData.dob || !formData.class_id || loadingClasses}
               >
                 {creating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Create

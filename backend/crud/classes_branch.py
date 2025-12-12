@@ -28,6 +28,6 @@ def get_classes(
     ]
 
 
-@router.post('/promote/{class_id}')
+# @router.post('/promote/{class_id}')
 
-@router.post('/create_student/{branch_id}')
+# @router.post('/create_student/{branch_id}')
